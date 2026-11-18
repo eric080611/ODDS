@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101116">
+<title>ODDS. — Equation Lab</title>
+<style>
+:root{--bg:#101116;--panel:#191b24;--panel2:#222531;--text:#f5f5f7;--muted:#9da2b3;--accent:#b8ff65;--line:#343846;--red:#ff7373}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#202331 0,#101116 52%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+button{font:inherit;cursor:pointer} .wrap{max-width:720px;margin:auto;padding:22px 16px 42px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.logo{font-weight:1000;font-size:29px;letter-spacing:-1.8px}.logo span{color:var(--accent)}
+.pill{font-size:11px;color:var(--accent);border:1px solid #557a37;border-radius:30px;padding:6px 10px;letter-spacing:1.2px;font-weight:800}
+h1{font-size:clamp(28px,7vw,42px);line-height:1.02;letter-spacing:-1.5px;margin:4px 0 8px}
+.sub{color:var(--muted);margin:0 0 20px;font-size:14px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#151720;padding:5px;border-radius:14px;margin:18px 0}
+.tab{border:0;background:transparent;color:var(--muted);padding:12px;border-radius:10px;font-weight:800}
+.tab.active{background:var(--accent);color:#141710}
+.card{background:linear-gradient(145deg,#1c1f29,#171922);border:1px solid var(--line);border-radius:20px;padding:18px;margin:14px 0;box-shadow:0 12px 32px #0002}
+.topline{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.target{font-size:clamp(42px,12vw,62px);font-weight:950;letter-spacing:-2px;color:var(--accent);text-align:center;margin:10px 0 2px;font-variant-numeric:tabular-nums}
+.target-label{text-align:center;color:var(--muted);font-size:11px;letter-spacing:1.5px;font-weight:800}
+.equation{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;margin:22px 0 18px}
+.slot{width:58px;height:58px;border:2px dashed #565d70;border-radius:13px;background:#12141b;color:var(--text);display:grid;place-items:center;font-size:23px;font-weight:900}
+.slot.filled{border:2px solid var(--accent);background:#273321;color:var(--accent)}
+.op{font-size:26px;font-weight:900;color:#d6d8df;min-width:16px;text-align:center}
+.numbers-label{font-size:11px;color:var(--muted);font-weight:800;letter-spacing:1.2px;margin:6px 0 10px}
+.numbers{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+.num{min-width:52px;height:52px;border:1px solid #4a5060;border-radius:13px;background:var(--panel2);color:var(--text);font-size:20px;font-weight:900}
+.num.used{opacity:.28;pointer-events:none;text-decoration:line-through}
+.hint{font-size:12px;color:var(--muted);text-align:center;margin:12px 0 0}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.primary,.secondary{border:0;border-radius:13px;padding:14px 12px;font-weight:900}
+.primary{background:var(--accent);color:#151a10}.secondary{background:#303443;color:var(--text)}
+.primary:disabled{opacity:.35;cursor:not-allowed}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
+.stat{background:#14161e;border:1px solid var(--line);border-radius:13px;padding:12px 8px;text-align:center}
+.stat strong{display:block;font-size:21px;font-variant-numeric:tabular-nums}.stat span{color:var(--muted);font-size:10px;letter-spacing:1px;font-weight:800}
+.result{display:none;text-align:center}.result.show{display:block}.score{font-size:52px;font-weight:1000;color:var(--accent);letter-spacing:-2px}
+.message{color:var(--muted);font-size:14px;margin:3px 0 14px}
+.note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:15px}
+footer{text-align:center;color:#73798a;font-size:11px;margin:24px 0 0}
+@media(max-width:390px){.slot{width:49px;height:52px}.op{font-size:23px}.card{padding:14px}.num{min-width:47px;height:48px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="logo">ODDS<span>.</span></div><div class="pill">BETA / 01</div></header>
+<h1>Think fast.<br>Get closer.</h1>
+<p class="sub">A daily number challenge. Skill, strategy, and a little luck.</p>
+
+<div class="tabs">
+<button class="tab active" id="dailyTab">DAILY</button>
+<button class="tab" id="unlimitedTab">UNLIMITED</button>
+</div>
+
+<section class="card" id="gameCard">
+  <div class="topline"><span id="modeLabel">TODAY'S CHALLENGE</span><span id="difficulty">LEVEL 01 · HARD</span></div>
+  <div class="target" id="target">418</div>
+  <div class="target-label">TARGET NUMBER</div>
+  <div class="equation" id="equation"></div>
+  <div class="numbers-label">CHOOSE A NUMBER, THEN A SLOT</div>
+  <div class="numbers" id="numbers"></div>
+  <p class="hint" id="hint">Use every number once. Operators cannot be moved.</p>
+  <div class="stats">
+    <div class="stat"><strong id="timer">00:00</strong><span>TIME</span></div>
+    <div class="stat"><strong id="placed">0/4</strong><span>PLACED</span></div>
+    <div class="stat"><strong id="best">—</strong><span>BEST SCORE</span></div>
+  </div>
+  <div class="actions">
+    <button class="secondary" id="resetBtn">RESET</button>
+    <button class="primary" id="submitBtn" disabled>LOCK IN</button>
+  </div>
+  <p class="note">Scoring is based on accuracy, not speed. Time is used as a tie-breaker. This beta saves your personal bests on this device only.</p>
+</section>
+
+<section class="card result" id="result">
+  <div class="topline"><span>CHALLENGE COMPLETE</span><span id="resultMode">DAILY</span></div>
+  <div class="score" id="score">0</div>
+  <div class="target-label">POINTS OUT OF 1,000</div>
+  <p class="message" id="resultMessage"></p>
+  <div class="stats">
+    <div class="stat"><strong id="yourResult">—</strong><span>YOUR RESULT</span></div>
+    <div class="stat"><strong id="difference">—</strong><span>OFF TARGET</span></div>
+    <div class="stat"><strong id="finalTime">—</strong><span>TIME</span></div>
+  </div>
+  <div class="actions">
+    <button class="secondary" id="backBtn">BACK TO GAME</button>
+    <button class="primary" id="newBtn">NEW PUZZLE</button>
+  </div>
+</section>
+<footer>ODDS. · FIND THE UNLIKELY</footer>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const OPS = ['+','×','−']; // fixed operator order; standard precedence
+let mode='daily', puzzle, selected=null, values=[], started=false, ended=false, elapsed=0, tick=null;
+const dailyKey = () => 'odds-daily-' + new Date().toISOString().slice(0,10);
+const bestKey = m => 'odds-best-' + m;
+const rand = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+
+function seededRandom(seed){let x=seed>>>0;return()=>{x=(x*1664525+1013904223)>>>0;return x/4294967296}}
+function makeDaily(){
+  const d=new Date(); const seed=Number(d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0'));
+  const r=seededRandom(seed);
+  const nums=[3,7,8,12];
+  // Rotate/shuffle deterministically
+  for(let i=nums.length-1;i>0;i--){let j=Math.floor(r()*(i+1));[nums[i],nums[j]]=[nums[j],nums[i]]}
+  return {target:90, nums, ops:[...OPS], id:dailyKey(), label:'TODAY\\'S CHALLENGE'};
+}
+function makeUnlimited(){
+  const nums=[rand(2,15),rand(2,15),rand(2,15),rand(2,15)];
+  const shuffled=[...nums].sort(()=>Math.random()-.5);
+  const base=shuffled[0]+shuffled[1]*shuffled[2]-shuffled[3];
+  const target=Math.max(1,base+rand(-18,18));
+  return {target,nums,ops:[...OPS],id:'u-'+Date.now(),label:'UNLIMITED RUN'};
+}
+function getBest(){return Number(localStorage.getItem(bestKey(mode))||0)}
+function startClock(){if(tick)clearInterval(tick);started=true;tick=setInterval(()=>{elapsed++;$('timer').textContent=formatTime(elapsed)},1000)}
+function formatTime(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function loadPuzzle(p){
+  puzzle=p;values=Array(4).fill(null);selected=null;started=false;ended=false;elapsed=0;
+  if(tick)clearInterval(tick);
+  $('target').textContent=puzzle.target;$('modeLabel').textContent=puzzle.label;
+  $('difficulty').textContent='LEVEL 01 · HARD';
+  $('timer').textContent='00:00';$('placed').textContent='0/4';$('best').textContent=getBest()||'—';
+  $('hint').textContent='Use every number once. Operators cannot be moved.';
+  $('result').classList.remove('show');$('gameCard').style.display='block';
+  render();
+}
+function render(){
+  const eq=$('equation');eq.innerHTML='';
+  for(let i=0;i<4;i++){
+    const s=document.createElement('button');s.className='slot'+(values[i]!==null?' filled':'');
+    s.textContent=values[i]===null?'?':puzzle.nums[values[i]];s.setAttribute('aria-label','Slot '+(i+1));
+    s.onclick=()=>{if(ended)return;if(!started)startClock();if(values[i]!==null){values[i]=null;render()}else if(selected!==null){values[i]=selected;selected=null;render()}};
+    eq.appendChild(s);
+    if(i<3){const op=document.createElement('span');op.className='op';op.textContent=puzzle.ops[i];eq.appendChild(op)}
+  }
+  const ns=$('numbers');ns.innerHTML='';
+  puzzle.nums.forEach((n,i)=>{const b=document.createElement('button');b.className='num'+(values.includes(i)?' used':'')+(selected===i?' selected':'');b.textContent=n;b.disabled=values.includes(i)||ended;b.onclick=()=>{if(!started)startClock();selected=selected===i?null:i;render()};ns.appendChild(b)});
+  // Internal slots store source indexes, so each number can only be used once.
+  for(let i=0;i<4;i++)if(values[i]!==null&&typeof values[i]==='number'&&values[i]>=0&&values[i]<4){} 
+  $('placed').textContent=values.filter(v=>v!==null).length+'/4';
+  $('submitBtn').disabled=values.some(v=>v===null)||ended;
+}
+function actualNumbers(){return values.map(i=>puzzle.nums[i])}
+function evaluate(nums){
+  // Fixed expression: a + b × c − d
+  return nums[0] + nums[1]*nums[2] - nums[3];
+}
+function scoreFor(result){
+  const diff=Math.abs(result-puzzle.target);
+  // Smooth accuracy curve, normalized to target magnitude; exact = 1000.
+  const scale=Math.max(30,Math.abs(puzzle.target)*0.22);
+  return Math.max(0,Math.round(1000*Math.exp(-diff/scale)));
+}
+function finish(){
+  if(ended)return;ended=true;if(!started)startClock();if(tick)clearInterval(tick);
+  const nums=actualNumbers(),result=evaluate(nums),diff=Math.abs(result-puzzle.target),score=scoreFor(result);
+  const old=getBest();if(score>old)localStorage.setItem(bestKey(mode),score);
+  $('gameCard').style.display='none';$('result').classList.add('show');
+  $('score').textContent=score;$('yourResult').textContent=result;$('difference').textContent=diff;$('finalTime').textContent=formatTime(elapsed);
+  $('resultMode').textContent=mode.toUpperCase();
+  $('resultMessage').textContent=diff===0?'Exact hit. That is seriously impressive.':score>=800?'Very close. Nice calculation.':score>=500?'Solid attempt. Can you get closer?':'Not quite — try a different arrangement.';
+}
+$('dailyTab').onclick=()=>{mode='daily';setTabs();loadPuzzle(makeDaily())};
+$('unlimitedTab').onclick=()=>{mode='unlimited';setTabs();loadPuzzle(makeUnlimited())};
+function setTabs(){$('dailyTab').classList.toggle('active',mode==='daily');$('unlimitedTab').classList.toggle('active',mode==='unlimited')}
+$('resetBtn').onclick=()=>loadPuzzle(puzzle);
+$('submitBtn').onclick=()=>{if(values.every(v=>v!==null))finish()};
+$('backBtn').onclick=()=>{$('result').classList.remove('show');$('gameCard').style.display='block';ended=true};
+$('newBtn').onclick=()=>{if(mode==='daily'){loadPuzzle(makeDaily())}else{loadPuzzle(makeUnlimited())}};
+loadPuzzle(makeDaily());
+</script>
+</body></html>
